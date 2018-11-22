@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-"""
-Clase (y programa principal) para un servidor de eco en UDP simple
-"""
+"""Clase (y programa principal) para un servidor de eco en UDP simple."""
 
 import socketserver
 import sys
@@ -19,10 +17,12 @@ except (IndexError, ValueError):
 
 
 class EchoHandler(socketserver.DatagramRequestHandler):
+    """Echo server class."""
 
-    LIST = ['INVITE', 'ACK', 'BYE']
     def handle(self):
-        while 1:  # Lee línea a línea lo que nos envía el cliente
+        """ENVIA MENSAJE AL CLIENTE."""
+        # Lee línea a línea lo que nos envía el cliente
+        while 1:
             line = self.rfile.read()
             methods = line.decode('utf-8').split(' ')
             method = methods[0]
