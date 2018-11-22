@@ -27,21 +27,19 @@ my_socket.connect((IPServer, int(Port)))
 Request = Method + ' ' + 'sip:' + Login + IPServer + ' SIP/2.0\r\n\r\n'
 
 print('Enviando: ', Request)
-my_socket.send(bytes(Request, 'utf-8') + b'\r\n\r\n') #Para pasarlo a bytes
-data = my_socket.recv(1024).decode('utf-8')
-print('Recibido--', data)
+my_socket.send(bytes(Request, 'utf-8') + b'\r\n\r\n')  # Para pasarlo a bytes
+data = my_socket.recv(1024)
 
-answer = 'SIP/2.0 100 Trying\r\n\r\n',
-answer += 'SIP/2.0 180 Ringing\r\n\r\n'
-answer += 'SIP/2.0 200 OK\r\n\r\n'
+answer = data.decode('utf-8').split('\r\n\r\n')[0:-1]
 
-if (data == answer):
-   # Enviamos el ack
-   ACK_Request = 'ACK' + '' + 'sip:' + Login + IPServer + 'SIP/2.0\r\n\r\n'
-   my_socket.send(bytes(ACK_Request, 'utf-8') + b'\r\n\r\n')
-   print("Enviando ACK:", ACK_Request)
-
+if answer == ['SIP/2.0 100 Trying\r\n\r\n', 'SIP/2.0 180 Ringing\r\n\r\n',
+              'SIP/2.0 200 OK\r\n\r\n']:
+  # Enviamos el ack
+  ACK_Request = str('ACK' + Request)
+  print("Enviando ACK:", ACK_Request)
+  my_socket.send(bytes(ACK_Request, 'utf-8') + b'\r\n\r\n')
+  data = my_socket.recv(1024)
+   
 elif (Method == 'BYE'):
-      print('Recibido --')
-      print('Terminando socket... BYE')
-      my_socket.close()  # cerramos conexión
+  print('Terminando socket... BYE')
+  my_socket.close()  # cerramos conexión
