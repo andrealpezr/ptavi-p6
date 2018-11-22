@@ -34,12 +34,10 @@ answer = data.decode('utf-8').split('\r\n\r\n')[0:-1]
 
 if answer == ['SIP/2.0 100 Trying\r\n\r\n', 'SIP/2.0 180 Ringing\r\n\r\n',
               'SIP/2.0 200 OK\r\n\r\n']:
-  # Enviamos el ack
-  ACK_Request = str('ACK' + Request)
-  print("Enviando ACK:", ACK_Request)
-  my_socket.send(bytes(ACK_Request, 'utf-8') + b'\r\n\r\n')
-  data = my_socket.recv(1024)
-   
+    ACK_Request = str('ACK' + Request)
+    print("Enviando ACK:", ACK_Request)
+    my_socket.send(bytes(ACK_Request, 'utf-8') + b'\r\n\r\n')
+    data = my_socket.recv(1024)
 elif (Method == 'BYE'):
-  print('Terminando socket... BYE')
-  my_socket.close()  # cerramos conexión
+    print('Terminando socket... BYE')
+    my_socket.close()  # cerramos conexión
