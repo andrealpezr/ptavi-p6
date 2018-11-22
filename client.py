@@ -13,15 +13,35 @@ try:
     Receiver = sys.argv[2]  # Datos del receptor: login, IP, puerto
     Login = Receiver.split('@')[0] + '@'  # receptor@
     IPServer = Receiver.split('@')[1].split(':')[0]  # IP receptor
-    Port = int(Receiver.split(':')[1])  # puerto IP
+    Port = int(Receiver.split('@')[1].split(':')[1])  # puerto IP
 
 except (IndexError, ValueError):
     sys.exit('Usage: python3 client.py method receiver@IP:SIPport')
 
-# Contenido que vamos a enviar
-Request = Method + ' ' + 'sip:' + Login + IPServer + ':' + str(Port)  + 'SIP/2.0\r\n\r\n'
-
 # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  as my_socket:
-    my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    my_socket.connect((IPServer, int(Port)))
+my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+my_socket.connect((IPServer, int(Port)))
+
+# Contenido que vamos a enviar (Petición SIP)
+Request = Method + ' ' + 'sip:' + Login + IPServer + ' SIP/2.0\r\n\r\n'
+
+print('Enviando: ', Request)
+my_socket.send(bytes(Request, 'utf-8') + b'\r\n\r\n') #Para pasarlo a bytes
+data = my_socket.recv(1024).decode('utf-8')
+print('Recibido--', data)
+
+answer = 'SIP/2.0 100 Trying\r\n\r\n',
+answer += 'SIP/2.0 180 Ringing\r\n\r\n'
+answer += 'SIP/2.0 200 OK\r\n\r\n'
+
+if (data == answer):
+   # Enviamos el ack
+   ACK_Request = 'ACK' + '' + 'sip:' + Login + IPServer + 'SIP/2.0\r\n\r\n'
+   my_socket.send(bytes(ACK_Request, 'utf-8') + b'\r\n\r\n')
+   print("Enviando ACK:", ACK_Request)
+
+elif (Method == 'BYE'):
+      print('Recibido --')
+      print('Terminando socket... BYE')
+      my_socket.close()  # cerramos conexión
