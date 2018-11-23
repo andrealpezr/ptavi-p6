@@ -36,7 +36,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             else:
                 self.wfile.write(b'SIP/2.0 400 Bad Request\r\n\r\n')
         elif method == 'ACK':
-            aEjecutar = '-/mp32rtp -i' + IP + ' -p 23032 < ' + Audio_file
+            aEjecutar = '-/mp32rtp -i' + ' ' + IP + ' -p 23032 < ' + Audio_file
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
             print('Audio enviado')
