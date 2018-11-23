@@ -22,32 +22,30 @@ class EchoHandler(socketserver.DatagramRequestHandler):
     def handle(self):
         """ENVIA MENSAJE AL CLIENTE."""
         # Lee línea a línea lo que nos envía el cliente
-        while 1:
-            line = self.rfile.read()
-            methods = line.decode('utf-8').split(' ')
-            method = methods[0]
-            if not line:  # Si no hay lineas en blanco sale del bucle
-                break
+        line = self.rfile.read()
+        print("El cliente nos envía " + line.decode('utf-8'))
+        methods = line.decode('utf-8').split()
+        method = methods[0]
 
-            if method == 'INVITE':
-                mensaje = 'SIP/2.0 100 Trying\r\n\r\n'
-                mensaje += 'SIP/2.0 180 Ringing\r\n\r\n'
-                mensaje += 'SIP/2.0 200 OK\r\n\r\n'
+        if method == 'INVITE':
+            if method[1].split('@'):
+                mensaje = b'SIP/2.0 100 Trying\r\n\r\n'
+                mensaje += b'SIP/2.0 180 Ringing\r\n\r\n'
+                mensaje += b'SIP/2.0 200 OK\r\n\r\n'
                 self.wfile.write(mensaje)
-                print('Enviando' + mensaje)
-            elif method == 'ACK':
-                aEjecutar = '-/mp32rtp -i' + IP + ' -p 23032 < ' + Audio_file
-                os.system('chmod 755 mp32rtp')
-                print('Vamos a ejecutar', aEjecutar)
-                os.system(aEjecutar)
-            elif method == 'BYE':
-                self.wfile.write('SIP/2.0 200 OK\r\n\r\n')
-            elif method != 'INVITE' or 'ACK' or 'BYE':
-                self.wfile.write('SIP/2.0 405 Method Not Allowed' + '\r\n\r\n')
-                break
             else:
-                self.wfile.write('SIP/2.0 400 Bad Request' + '\r\n\r\n')
-                break
+                self.wfile.write(b'SIP/2.0 400 Bad Request\r\n\r\n')
+        elif method == 'ACK':
+            aEjecutar = '-/mp32rtp -i' + IP + ' -p 23032 < ' + Audio_file
+            print('Vamos a ejecutar', aEjecutar)
+            os.system(aEjecutar)
+            print('Audio enviado')
+        elif method == 'BYE':
+            self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
+        elif method != 'INVITE' or 'ACK' or 'BYE':
+            self.wfile.write(b'SIP/2.0 405 Method Not Allowed\r\n\r\n')
+        else:
+            self.wfile.write(b'SIP/2.0 400 Bad Request\r\n\r\n')
 
 
 if __name__ == "__main__":
