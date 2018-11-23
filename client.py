@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""Programa cliente que abre un socket a un servidor
-
-@author: andrea
-"""
+"""Programa cliente que abre un socket a un servidor @author: Andrea."""
 
 import socket
 import sys
@@ -17,10 +13,9 @@ if len(sys.argv) != 3:
 
 try:
     Method = sys.argv[1]  # Método SIP
-    Receiver = sys.argv[2]  #Datos del receptor
+    Receiver = sys.argv[2]  # Datos del receptor
     Port = int(Receiver.split(":", -1)[1])  # Puerto IP
-    SIP = "sip:" + Receiver.split(":", -1)[0] + " SIP/2.0\r\n\r\n"  # Mensaje 
-    
+    SIP = "sip:" + Receiver.split(":", -1)[0] + " SIP/2.0\r\n\r\n"  # Mensaje
 except(IndexError, ValueError):
     sys.exit("Usage: python3 client.py method receiver@IP:SIPport")
 
@@ -41,9 +36,9 @@ print(data.decode('utf-8'))
 data = data.decode('utf-8').split()
 
 if data[1] == '100' and data[4] == '180' and data[7] == '200':
-   ANSWER = "ACK " + SIP
-   print('Sending ACK...')
-   my_socket.send(bytes(ANSWER, 'utf-8') + b'\r\n\r\n')  # Para pasarlo a bytes
+    ANSWER = "ACK " + SIP
+    print('Sending ACK...')
+    my_socket.send(bytes(ANSWER, 'utf-8') + b'\r\n\r\n')  # Pasamos a bytes
 
 print('Ending socket... BYE')
 my_socket.close()  # Cerramos conexión
